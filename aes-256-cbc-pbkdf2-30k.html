@@ -59,7 +59,7 @@ Example:
         var keySizeInBytes = keySizeInBits/8;
         var mode = slowAES.modeOfOperation.CBC;
         var iv = "BxeNTUYAVB3CW7Ck";
-        var iterations = 30000;
+        var iterations = 1000;
         var derivedKey = null;
         var mypbkdf2 = new PBKDF2(this.password, iv, iterations, keySizeInBytes);
 
@@ -67,15 +67,21 @@ Example:
           derivedKey = key;
 
           if(this.mnemonic){
-            this.hash = this._encryptString(this.mnemonic, derivedKey, iv);
+            var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
+            console.log(bytes);
+            this.hash = cryptoHelpers.convertByteArrayToString(bytes);
             console.log(this.hash);
+            this.longHash = encodeURIComponent(this.hash)
+            console.log(this.longHash);
+            console.log(decodeURIComponent(this.longHash));
           }
 
-          if(this.hash){
-            this.mnemonic = this._decryptString(this.hash, derivedKey, iv);
-            console.log(this.mnemonic);
-          }
-          
+          // if(this.hash){
+          //   this.mnemonic = this._decryptString(this.hash, derivedKey, iv);
+          // //var bytesToEncrypt = cryptoHelpers.convertStringToByteArray(plainText);
+          //   console.log(this.mnemonic);
+          // }
+
         }.bind(this);
 
         mypbkdf2.deriveKey(function(){}, result_callback);
