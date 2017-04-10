@@ -1,0 +1,58 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`aes-256-cbc-pbkdf2-30k`
+
+Encrypt a mnemonic wth AES-256-CBC encryption using a strong password and the PBKDF2 KDF with 30,000 rounds.
+
+Example:
+```
+<aes-256-cbc-pbkdf2-30k></aes-256-cbc-pbkdf2-30k>
+```
+
+@demo demo/index.html
+-->
+
+<dom-module id="aes-256-cbc-pbkdf2-30k">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+   
+  <div id="qrcode"></div>
+  </template>
+
+  <script>
+    class MyElement extends Polymer.Element {
+      static get is() { return 'aes-256-cbc-pbkdf2-30k'; }
+      static get properties() {
+        return {
+        /**
+        * Represents the mnemonic to be encrypted
+        *
+        * @type {String}
+        */
+          mnemonic: {
+            type: String,
+            observer: "_makeHash",
+          },
+          password:{
+            type: String,
+          },
+          hash:{
+            type: String,
+          }
+        };
+      }
+      /**
+      * Make AES
+      */
+      _makeHash() {
+
+      }
+
+    } window.customElements.define(MyElement.is, MyElement);
+  </script>
+</dom-module>
