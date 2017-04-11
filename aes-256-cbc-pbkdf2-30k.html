@@ -121,19 +121,23 @@ Example:
               var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
               var hash = cryptoHelpers.convertByteArrayToString(bytes);
               this.hash = encodeURIComponent(hash);
-              if(this.debug){
-                console.log('Hash: '+this.hash);
-              }
+              if(this.debug){console.log('Mnemonic: '+this.mnemonic);}
+              if(this.debug){console.log('Bytes: '+bytes);}
+              if(this.debug){console.log('Encoded Hash: '+hash);}
+              if(this.debug){console.log('Hash: '+this.hash);}
               this.working = false;
+              if(this.debug){console.log('Done');}
             }
             if(this.direction == 'decrypt' && this.hash){
               var hash = decodeURIComponent(this.hash);
               var bytes = cryptoHelpers.convertStringToByteArray(hash);
               this.mnemonic = this._decryptString(bytes, derivedKey, iv);
-              if(this.debug){
-                console.log('Mnemonic: '+this.mnemonic);
-              }
+              if(this.debug){console.log('Hash: '+this.hash);}
+              if(this.debug){console.log('Encoded Hash: '+hash);}
+              if(this.debug){console.log('Bytes: '+bytes);}
+              if(this.debug){console.log('Mnemonic: '+this.mnemonic);}
               this.working = false;
+              if(this.debug){console.log('Done');}
             }
           }
         }.bind(this);
