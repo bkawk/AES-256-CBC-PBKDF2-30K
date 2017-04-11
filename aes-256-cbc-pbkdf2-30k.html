@@ -4,7 +4,7 @@
 <!--
 `aes-256-cbc-pbkdf2-30k`
 
-Encrypt a 64 byte mnemonic wth AES-256-CBC encryption using a password and the PBKDF2 KDF with 30,000 rounds.
+Encrypt a 64 byte mnemonic wth AES-256-CBC encryption using a given password and the PBKDF2 KDF with the given number of rounds.
 
 Example:
 ```
@@ -87,6 +87,15 @@ Example:
           working:{
             type: Boolean,
             value: false,
+          },
+          /**
+          * Presents true if the result and working is logged 
+          *
+          * @type {Boolean}
+          */
+          debug:{
+            type: Boolean,
+            value: false,
           }
         };
       }
@@ -94,6 +103,9 @@ Example:
       * Make Hash
       */
       _makeHash() {
+        if(this.debug){
+          console.log('Working');
+        }
         this.working = true;
         var keySizeInBits = slowAES.aes.keySize.SIZE_256;
         var keySizeInBytes = keySizeInBits/8;
@@ -105,17 +117,22 @@ Example:
         var result_callback = function(key) {
           derivedKey = key;
           if(this.direction && this.password){
-            if(this.direction == 'encode' && this.mnemonic){
+            if(this.direction == 'encrypt' && this.mnemonic){
               var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
               var hash = cryptoHelpers.convertByteArrayToString(bytes);
               this.hash = encodeURIComponent(hash);
+              if(this.debug){
+                console.log('Hash: '+this.hash);
+              }
               this.working = false;
             }
-            if(this.direction == 'decode' && this.hash){
+            if(this.direction == 'decrypt' && this.hash){
               var hash = decodeURIComponent(this.hash);
-              console.log(hash)
               var bytes = cryptoHelpers.convertStringToByteArray(hash);
               this.mnemonic = this._decryptString(bytes, derivedKey, iv);
+              if(this.debug){
+                console.log('Mnemonic: '+this.mnemonic);
+              }
               this.working = false;
             }
           }
