@@ -1,6 +1,7 @@
 # \<aes-256-cbc-pbkdf2-30k\>
 
-some description
+Encrypt a mnemonic wth AES-256-CBC encryption using a given password and the PBKDF2 KDF with the given number of rounds.
+Toggle debug to get a console view of the values.
 
 ## Install the Polymer-CLI
 
@@ -37,58 +38,3 @@ $ polymer test
 
 Your application is already set up to be tested via [web-component-tester](https://github.com/Polymer/web-component-tester). Run `polymer test` to run your application's test suite locally.
 
-
-Detect()
-=================
-Get hash from local storage
-- If we can get the hash, go to Login() else go to Create()
-
-{{action}} none
-{{hash}} from storage 
-
-
-Login()
-=================
-Enter Password
-Get Hash from local storage
-Decrypt
-- If Decrypt pass go to home 
-- If the user forgot the password go to import
-
-{{action}} login
-{{password}} from user
-{{hash}} from storage
-{{mnemonic}} decrypted
-
-
-Create()
-=================
-Enter Password
-Generate Mnemonic 
-Encrypt
-Save Hash to local storage
-- go to home 
-- If the user forgot the password go to import
-
-{{action}} create
-{{password}} from user
-{{mnemonic}} generated 
-{{hash}} generated
-
-
-Import()
-=================
-Enter Mnemonic 
-Enter Password
-Encrypt
-Save Hash to local storage
-- go to home 
-
-{{action}} import
-{{mnemonic}}  from user 
-{{password}} from user
-{{hash}} generated
-
-
-Home
-=================
