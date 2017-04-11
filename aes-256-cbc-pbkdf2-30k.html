@@ -4,7 +4,7 @@
 <!--
 `aes-256-cbc-pbkdf2-30k`
 
-Encrypt a 64 byte mnemonic wth AES-256-CBC encryption using a given password and the PBKDF2 KDF with the given number of rounds.
+Encrypt a mnemonic wth AES-256-CBC encryption using a given password and the PBKDF2 KDF with the given number of rounds.
 
 Example:
 ```
@@ -103,9 +103,7 @@ Example:
       * Make Hash
       */
       _makeHash() {
-        if(this.debug){
-          console.log('Working');
-        }
+        if(this.debug){console.debug('Working, please wait...');}
         this.working = true;
         var keySizeInBits = slowAES.aes.keySize.SIZE_256;
         var keySizeInBytes = keySizeInBits/8;
@@ -117,27 +115,30 @@ Example:
         var result_callback = function(key) {
           derivedKey = key;
           if(this.direction && this.password){
+            if(this.debug){console.debug('We have a direction and a password');}
             if(this.direction == 'encrypt' && this.mnemonic){
+              if(this.debug){console.debug('Encryption request processing');}
               var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
               var hash = cryptoHelpers.convertByteArrayToString(bytes);
               this.hash = encodeURIComponent(hash);
-              if(this.debug){console.log('Mnemonic: '+this.mnemonic);}
-              if(this.debug){console.log('Bytes: '+bytes);}
-              if(this.debug){console.log('Encoded Hash: '+hash);}
-              if(this.debug){console.log('Hash: '+this.hash);}
+              if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
+              if(this.debug){console.debug('Bytes: '+bytes);}
+              if(this.debug){console.debug('Unencoded Hash: '+hash);}
+              if(this.debug){console.debug('Hash: '+this.hash);}
               this.working = false;
-              if(this.debug){console.log('Done');}
+              if(this.debug){console.debug('Done');}
             }
             if(this.direction == 'decrypt' && this.hash){
+              if(this.debug){console.debug('Decryption request processing');}
               var hash = decodeURIComponent(this.hash);
               var bytes = cryptoHelpers.convertStringToByteArray(hash);
               this.mnemonic = this._decryptString(bytes, derivedKey, iv);
-              if(this.debug){console.log('Hash: '+this.hash);}
-              if(this.debug){console.log('Encoded Hash: '+hash);}
-              if(this.debug){console.log('Bytes: '+bytes);}
-              if(this.debug){console.log('Mnemonic: '+this.mnemonic);}
+              if(this.debug){console.debug('Hash: '+this.hash);}
+              if(this.debug){console.debug('Unencoded Hash: '+hash);}
+              if(this.debug){console.debug('Bytes: '+bytes);}
+              if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
               this.working = false;
-              if(this.debug){console.log('Done');}
+              if(this.debug){console.debug('Done!');}
             }
           }
         }.bind(this);
