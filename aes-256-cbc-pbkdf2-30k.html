@@ -6,8 +6,6 @@
 
 Encrypt a 64 byte mnemonic wth AES-256-CBC encryption using a password and the PBKDF2 KDF with 30,000 rounds.
 
-
-
 Example:
 ```
 <aes-256-cbc-pbkdf2-30k></aes-256-cbc-pbkdf2-30k>
@@ -23,8 +21,6 @@ Example:
         display: block;
       }
     </style>
-   
-
   </template>
 
   <script>
@@ -32,22 +28,65 @@ Example:
       static get is() { return 'aes-256-cbc-pbkdf2-30k'; }
       static get properties() {
         return {
-        /**
-        * Represents the mnemonic to be encrypted
-        *
-        * @type {String}
-        */
+          /**
+          * Represents the mnemonic to be encrypted
+          *
+          * @type {String}
+          */
           mnemonic: {
+            type: String
+          },
+          /**
+          * Represents the password to be used to encrypt or decrypt the mnemonic
+          *
+          * @type {String}
+          */
+          password:{
+            type: String
+          },
+          /**
+          * Represents the the hash to decrypt or the result of an encrypted mnemonic
+          *
+          * @type {String}
+          */
+          hash:{
+            type: String
+          },
+          /**
+          * Represents the command to encrypt or decrypt
+          *
+          * @type {String}
+          */
+          direction:{
             type: String,
-            value: "testMnemonic",
             observer: "_makeHash",
           },
-          password:{
+          /**
+          * Represents the initial vecotor please make this unique to your app
+          *
+          * @type {String}
+          */
+          initialVector:{
             type: String,
-            value: "testPassword"
+            value: 'ZxeaTuYAVB1CW7Cw',
           },
-          hash:{
-            type: String,
+          /**
+          * Represents the number of key rounds, the higher the more expensive the operation
+          *
+          * @type {String}
+          */
+          rounds:{
+            type: Number,
+            value: 30000,
+          },
+          /**
+          * Presents true if the encryption is working 
+          *
+          * @type {Boolean}
+          */
+          working:{
+            type: Boolean,
+            value: false,
           }
         };
       }
@@ -55,49 +94,43 @@ Example:
       * Make Hash
       */
       _makeHash() {
+        this.working = true;
         var keySizeInBits = slowAES.aes.keySize.SIZE_256;
         var keySizeInBytes = keySizeInBits/8;
         var mode = slowAES.modeOfOperation.CBC;
-        var iv = "BxeNTUYAVB3CW7Ck";
-        var iterations = 1000;
+        var iv = this.initialVector;
+        var rounds = this.rounds;
         var derivedKey = null;
-        var mypbkdf2 = new PBKDF2(this.password, iv, iterations, keySizeInBytes);
-
+        var mypbkdf2 = new PBKDF2(this.password, iv, rounds, keySizeInBytes);
         var result_callback = function(key) {
           derivedKey = key;
-
-          if(this.mnemonic){
-            var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
-            console.log(bytes);
-            this.hash = cryptoHelpers.convertByteArrayToString(bytes);
-            console.log(this.hash);
-            this.longHash = encodeURIComponent(this.hash)
-            console.log(this.longHash);
-            console.log(decodeURIComponent(this.longHash));
+          if(this.direction && this.password){
+            if(this.direction == 'encode' && this.mnemonic){
+              var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
+              var hash = cryptoHelpers.convertByteArrayToString(bytes);
+              this.hash = encodeURIComponent(hash);
+              this.working = false;
+            }
+            if(this.direction == 'decode' && this.hash){
+              var hash = decodeURIComponent(this.hash);
+              console.log(hash)
+              var bytes = cryptoHelpers.convertStringToByteArray(hash);
+              this.mnemonic = this._decryptString(bytes, derivedKey, iv);
+              this.working = false;
+            }
           }
-
-          // if(this.hash){
-          //   this.mnemonic = this._decryptString(this.hash, derivedKey, iv);
-          // //var bytesToEncrypt = cryptoHelpers.convertStringToByteArray(plainText);
-          //   console.log(this.mnemonic);
-          // }
-
         }.bind(this);
-
         mypbkdf2.deriveKey(function(){}, result_callback);
       }
-
       _encryptString(plainText, key, iv){
         var bytesToEncrypt = cryptoHelpers.convertStringToByteArray(plainText);
         return this._encryptBytes(bytesToEncrypt, key, iv);
       }
-
       _decryptString(encryptedByteArray, key, iv){
         var bytes = this._decryptBytes(encryptedByteArray, key, iv);
         var decryptedString = cryptoHelpers.convertByteArrayToString(bytes);
         return decryptedString;
       }
-
       _encryptBytes(plainText, key, iv){
         var t = typeof plainText;
         if (t == "string") {
@@ -106,12 +139,10 @@ Example:
         var result = slowAES.encrypt(plainText, slowAES.modeOfOperation.CBC, key, iv);
         return result;
       }
-
       _decryptBytes(encryptedByteArray, key, iv){
         var result = slowAES.decrypt(encryptedByteArray, slowAES.modeOfOperation.CBC, key, iv);
         return result;
       }
-
     } window.customElements.define(MyElement.is, MyElement);
   </script>
 </dom-module>
