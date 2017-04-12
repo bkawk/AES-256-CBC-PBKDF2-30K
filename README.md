@@ -1,6 +1,13 @@
 # \<aes-256-cbc-pbkdf2-30k\>
 
 Encrypt a mnemonic wth AES-256-CBC encryption using a given password and the PBKDF2 KDF with the given number of rounds.
+
+To encrypt: Set the direction to 'encrypt' and pass in a password, mnemonic. And save the hash and initialisation vector.
+
+To decrypt: Set the direction to 'decrypt' and pass in the password, hash and initialisation vector.
+
+Every time you encrypt a new initialisation vector will be created for you, be sure to save this with the generated hash.
+
 Toggle debug to get a console view of the values.
 
 ## Install the Polymer-CLI
