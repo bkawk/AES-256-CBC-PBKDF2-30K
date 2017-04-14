@@ -34,7 +34,8 @@ Example:
           * @type {String}
           */
           mnemonic: {
-            type: String
+            type: String,
+            notify: true,
           },
           /**
           * Represents the password to be used to encrypt or decrypt the mnemonic
@@ -86,6 +87,7 @@ Example:
           working:{
             type: Boolean,
             value: false,
+            notify: true
           },
           /**
           * Presents true if the result and working is logged 
@@ -105,17 +107,6 @@ Example:
             type: String
           }
         };
-      }
-      /**
-      * PUBLIC Encrypt
-      */
-      encrypt(password, mnemonic, localStorage){
-        if(password && mnemonic){
-          this.password = password;
-          this.mnemonic = mnemonic;
-          this.localStorage = localStorage;
-          this.direction = 'encrypt' 
-        }
       }
       /**
       * Make Hash
@@ -147,9 +138,7 @@ Example:
               if(this.debug){console.debug('Encryption request processing');}
               var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
               this.hash = (this._toHexString(bytes))
-              if(this.localStorage){ 
-                var vault = JSON.stringify({hash: this.hash, iv: this.initializationVector}); 
-                localStorage.setItem(this.localStorage, vault);}
+              localStorage.setItem("vault", JSON.stringify({hash: this.hash, iv: this.initializationVector}));
               if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
               if(this.debug){console.debug('Hash: '+this.hash);}
               this.working = false;
