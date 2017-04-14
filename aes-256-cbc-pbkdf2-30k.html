@@ -24,7 +24,7 @@ Example:
   </template>
 
   <script>
-    class MyElement extends Polymer.Element {
+    class aes256cbc extends Polymer.Element {
       static get is() { return 'aes-256-cbc-pbkdf2-30k'; }
       static get properties() {
         return {
@@ -202,6 +202,6 @@ Example:
         var result = slowAES.decrypt(encryptedByteArray, slowAES.modeOfOperation.CBC, key, iv);
         return result;
       }
-    } window.customElements.define(MyElement.is, MyElement);
+    } window.customElements.define(aes256cbc.is, aes256cbc);
   </script>
 </dom-module>
