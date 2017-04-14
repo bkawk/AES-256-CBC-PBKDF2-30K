@@ -111,11 +111,10 @@ Example:
       */
       encrypt(password, mnemonic, localStorage){
         if(password && mnemonic){
-          this.direction = 'encrypt' 
           this.password = password;
           this.mnemonic = mnemonic;
           this.localStorage = localStorage;
-          this._makeHash();
+          this.direction = 'encrypt' 
         }
       }
       /**
@@ -148,7 +147,9 @@ Example:
               if(this.debug){console.debug('Encryption request processing');}
               var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
               this.hash = (this._toHexString(bytes))
-              if(this.localStorage){ localStorage.setItem(this.localStorage, {hash: this.hash, iv: this.initializationVector});}
+              if(this.localStorage){ 
+                var vault = JSON.stringify({hash: this.hash, iv: this.initializationVector}); 
+                localStorage.setItem(this.localStorage, vault);}
               if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
               if(this.debug){console.debug('Hash: '+this.hash);}
               this.working = false;
