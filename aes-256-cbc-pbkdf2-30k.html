@@ -95,8 +95,28 @@ Example:
           debug:{
             type: Boolean,
             value: false,
+          },
+          /**
+          * represents the name to use in local storage
+          *
+          * @type {Boolean}
+          */
+          localStorage:{
+            type: String
           }
         };
+      }
+      /**
+      * PUBLIC Encrypt
+      */
+      encrypt(password, mnemonic, localStorage){
+        if(password && mnemonic){
+          this.direction = 'encrypt' 
+          this.password = password;
+          this.mnemonic = mnemonic;
+          this.localStorage = localStorage;
+          this._makeHash();
+        }
       }
       /**
       * Make Hash
@@ -128,6 +148,7 @@ Example:
               if(this.debug){console.debug('Encryption request processing');}
               var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
               this.hash = (this._toHexString(bytes))
+              if(this.localStorage){ localStorage.setItem(this.localStorage, {hash: this.hash, iv: this.initializationVector});}
               if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
               if(this.debug){console.debug('Hash: '+this.hash);}
               this.working = false;
