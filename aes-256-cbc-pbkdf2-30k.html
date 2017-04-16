@@ -35,7 +35,6 @@ Example:
           */
           mnemonic: {
             type: String,
-            notify: true,
           },
           /**
           * Represents the password to be used to encrypt or decrypt the mnemonic
@@ -60,7 +59,6 @@ Example:
           */
           direction:{
             type: String,
-            observer: "_makeHash",
           },
           /**
           * Represents the 128bit initial vecotor to use when decrypting or has been used when encrypting
@@ -78,16 +76,6 @@ Example:
           rounds:{
             type: Number,
             value: 30000,
-          },
-          /**
-          * Presents true if the encryption is working 
-          *
-          * @type {Boolean}
-          */
-          working:{
-            type: Boolean,
-            value: false,
-            notify: true
           },
           /**
           * Presents true if the result and working is logged 
@@ -108,54 +96,114 @@ Example:
           }
         };
       }
+      
+    connectedCallback(){
+      super.connectedCallback();
+        // this.encrypt('some text to enc', 'mypassword').then(function(response) {
+        //   console.log("============ YES !")
+        //   console.log(response)
+        // }).catch(function(error) {
+        //   console.log("============ NOO !")
+        //   console.log(error)
+        // })
+
+        // this.decrypt('9b1188713a374a332d50fe9ffb0a5e175b1419781001003350c9dc4a076be37d', '04340ac605cec140c6c4afdcc5f2a9e2', 'mypassword').then(function(response) {
+        //   console.log("============ YES !")
+        //   console.log(response)
+        // }).catch(function(error) {
+        //   console.log("============ NOO !")
+        //   console.log(error)
+        // })
+    }
+
+      /**
+      * Decrypt
+      */
+      decrypt(hash, iv, password) {
+        return new Promise(function(resolve, reject) {
+          this.hash = this.initializationVector = this.password = this.direction = this.mnemonic = null
+          this.hash = hash
+          this.initializationVector = iv
+          this.password = password
+          this.direction = 'decrypt'
+          this._makeHash().then(function(response) {
+            resolve(response);
+          }).catch(function(error) {
+            reject(error);
+          })
+        }.bind(this))
+      }
+
+      /**
+      * Encrypt
+      */
+      encrypt(mnemonic, password) {
+        return new Promise(function(resolve, reject) {
+          this.hash = this.initializationVector = this.password = this.direction = this.mnemonic = null
+          this.password = password
+          this.mnemonic = mnemonic
+          this.direction = 'encrypt'
+          this._makeHash().then(function(response) {
+            resolve(response);
+          }).catch(function(error) {
+            reject(error);
+          })
+        }.bind(this))
+      }
       /**
       * Make Hash
       */
       _makeHash() {
-        if(this.debug){console.debug('Working, please wait...');}
-        this.working = true;
-        var keySizeInBits = slowAES.aes.keySize.SIZE_256;
-        var keySizeInBytes = keySizeInBits/8;
-        var mode = slowAES.modeOfOperation.CBC;
-        
-        if(this.initializationVector){
-          var iv = this.initializationVector
-        } else{
-          var array = window.crypto.getRandomValues(new Uint8Array(16));
-          var iv = this._toHexString(array)
-          this.initializationVector = iv;
-        }
-        
-        if(this.debug){console.debug('Initialization Vector:' + iv);}
-        var rounds = this.rounds;
-        var derivedKey = null;
-        var mypbkdf2 = new PBKDF2(this.password, iv, rounds, keySizeInBytes);
-        var result_callback = function(key) {
-          derivedKey = key;
-          if(this.direction && this.password){
-            if(this.debug){console.debug('We have a direction and a password');}
-            if(this.direction == 'encrypt' && this.mnemonic){
-              if(this.debug){console.debug('Encryption request processing');}
-              var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
-              this.hash = (this._toHexString(bytes))
-              localStorage.setItem("vault", JSON.stringify({hash: this.hash, iv: this.initializationVector}));
-              if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
-              if(this.debug){console.debug('Hash: '+this.hash);}
-              this.working = false;
-              if(this.debug){console.debug('Done');}
-            }
-            if(this.direction == 'decrypt' && this.hash){
-              if(this.debug){console.debug('Decryption request processing');}
-              var bytes = this._toByteArray(this.hash);
-              this.mnemonic = this._decryptString(bytes, derivedKey, iv);
-              if(this.debug){console.debug('Hash: '+this.hash);}
-              if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
-              this.working = false;
-              if(this.debug){console.debug('Done!');}
-            }
+        return new Promise(function(resolve, reject) {
+          if(this.debug){console.debug('Working, please wait...');}
+          var keySizeInBits = slowAES.aes.keySize.SIZE_256;
+          var keySizeInBytes = keySizeInBits/8;
+          var mode = slowAES.modeOfOperation.CBC;
+          
+          if(this.initializationVector){
+            var iv = this.initializationVector
+          } else {
+            var array = window.crypto.getRandomValues(new Uint8Array(16));
+            var iv = this._toHexString(array)
+            this.initializationVector = iv;
           }
-        }.bind(this);
-        mypbkdf2.deriveKey(function(){}, result_callback);
+          
+          if(this.debug){console.debug('Initialization Vector:' + iv);}
+          var rounds = this.rounds;
+          var derivedKey = null;
+          var mypbkdf2 = new PBKDF2(this.password, iv, rounds, keySizeInBytes);
+          var result_callback = function(key) {
+            derivedKey = key;
+            if(this.direction && this.password){
+              if(this.debug){console.debug('We have a direction and a password');}
+              
+              
+              if(this.direction == 'encrypt' && this.mnemonic){
+                if(this.debug){console.debug('Encryption request processing');}
+                var bytes = this._encryptString(this.mnemonic, derivedKey, iv);
+                this.hash = (this._toHexString(bytes))
+                localStorage.setItem("vault", JSON.stringify({hash: this.hash, iv: this.initializationVector}));
+                if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
+                if(this.debug){console.debug('Hash: '+this.hash);}
+                resolve(JSON.stringify({hash: this.hash, iv: this.initializationVector}))
+                if(this.debug){console.debug('Done');}
+              }
+
+              if(this.direction == 'decrypt' && this.hash){
+                if(this.debug){console.debug('Decryption request processing');}
+                var bytes = this._toByteArray(this.hash);
+                this.mnemonic = this._decryptString(bytes, derivedKey, iv);
+                if(this.debug){console.debug('Hash: '+this.hash);}
+                if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
+                resolve(JSON.stringify({mnemonic: this.mnemonic}))
+                if(this.debug){console.debug('Done!');}
+              }
+
+
+            }
+          }.bind(this);
+          mypbkdf2.deriveKey(function(){}, result_callback);
+        }.bind(this))
       }
       _toHexString(byteArray) {
         return Array.prototype.map.call(byteArray, function(byte) {
