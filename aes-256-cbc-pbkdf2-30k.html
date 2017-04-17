@@ -185,7 +185,7 @@ Example:
                 localStorage.setItem("vault", JSON.stringify({hash: this.hash, iv: this.initializationVector}));
                 if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
                 if(this.debug){console.debug('Hash: '+this.hash);}
-                resolve(JSON.stringify({hash: this.hash, iv: this.initializationVector}))
+                resolve({hash: this.hash, iv: this.initializationVector})
                 if(this.debug){console.debug('Done');}
               }
 
@@ -195,7 +195,7 @@ Example:
                 this.mnemonic = this._decryptString(bytes, derivedKey, iv);
                 if(this.debug){console.debug('Hash: '+this.hash);}
                 if(this.debug){console.debug('Mnemonic: '+this.mnemonic);}
-                resolve(JSON.stringify({mnemonic: this.mnemonic}))
+                resolve({mnemonic: this.mnemonic})
                 if(this.debug){console.debug('Done!');}
               }
 
